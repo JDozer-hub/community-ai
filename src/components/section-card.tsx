@@ -33,7 +33,7 @@ export function ThemeSectionCard({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-[15px]">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground">
+            <span className="btn-glass flex h-8 w-8 items-center justify-center rounded-[0.9rem] text-brand">
               <Icon className="h-4 w-4" />
             </span>
             {title}

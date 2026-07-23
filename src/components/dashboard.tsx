@@ -15,7 +15,14 @@ import type {
   StoredComment,
   VideoMeta,
 } from "@/lib/schema";
-import { AlertCircle, ArrowRight, Sparkles } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  History,
+  LayoutDashboard,
+  MessageSquareText,
+  Sparkles,
+} from "lucide-react";
 
 type Phase = "idle" | "running" | "done" | "error";
 
@@ -219,119 +226,161 @@ export function Dashboard() {
     }
   }, []);
 
+  const resetToIdle = () => {
+    setPhase("idle");
+    setResult(null);
+    setError(null);
+    setUrl("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToHistory = () => {
+    document.getElementById("run-history")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-      <header className="mb-8 text-center">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">
-          <Sparkles className="h-3.5 w-3.5" />
-          YouTube Community Intelligence
-        </div>
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Community AI</h1>
-        <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-          Automatically analyze YouTube communities.
-        </p>
-      </header>
-
-      <Card className="mx-auto max-w-3xl">
-        <CardContent className="p-5">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              analyze(url);
-            }}
-            className="flex flex-col gap-3 sm:flex-row"
-          >
-            <Input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Paste a YouTube video or channel URL…"
-              className="h-11 flex-1 text-[15px]"
-              disabled={phase === "running"}
-              autoFocus
-            />
-            <Button
-              type="submit"
-              size="lg"
-              className="h-11 shrink-0"
-              disabled={phase === "running" || !url.trim()}
+    <div className="min-h-screen p-3 sm:p-4 lg:p-5">
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1400px] gap-3 sm:min-h-[calc(100vh-2rem)] lg:gap-4">
+        {/* Floating dark glass rail */}
+        <aside className="glass-panel-dark hidden w-[72px] shrink-0 flex-col items-center rounded-[1.85rem] py-5 text-sidebar-foreground sm:flex">
+          <div className="btn-glass-primary mb-8 flex h-11 w-11 items-center justify-center rounded-[1.15rem]">
+            <MessageSquareText className="h-5 w-5" />
+          </div>
+          <nav className="flex flex-1 flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={resetToIdle}
+              title="Analyze"
+              className="btn-glass-dark flex h-11 w-11 items-center justify-center rounded-[1.15rem] text-sidebar-active"
             >
-              {phase === "running" ? "Analyzing…" : "Analyze Community"}
-              {phase !== "running" && <ArrowRight className="h-4 w-4" />}
-            </Button>
-          </form>
-
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-muted-foreground">Try:</span>
-            {EXAMPLES.map((ex) => (
-              <button
-                key={ex}
-                onClick={() => {
-                  setUrl(ex);
-                  analyze(ex);
-                }}
-                disabled={phase === "running"}
-                className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
-              >
-                {ex.replace("https://www.youtube.com/", "")}
-              </button>
-            ))}
+              <LayoutDashboard className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={scrollToHistory}
+              title="Recent analyses"
+              className="btn-glass-dark flex h-11 w-11 items-center justify-center rounded-[1.15rem] text-sidebar-muted hover:text-sidebar-active"
+            >
+              <History className="h-5 w-5" />
+            </button>
+          </nav>
+          <div className="btn-glass-dark mt-auto flex h-10 w-10 items-center justify-center rounded-[1.05rem] text-[11px] font-semibold tracking-wide text-[#c7d4ff]">
+            CA
           </div>
-        </CardContent>
-      </Card>
+        </aside>
 
-      <div className="mt-6 space-y-6">
-        {phase === "running" && (
-          <div className="mx-auto max-w-3xl">
-            <ProgressPanel phase={progress} />
-          </div>
-        )}
-
-        {phase === "error" && error && (
-          <div className="mx-auto max-w-3xl">
-            <Card className="border-destructive/40">
-              <CardContent className="flex items-start gap-3 p-5">
-                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+        {/* Main frosted shell */}
+        <div className="glass-panel flex min-w-0 flex-1 flex-col overflow-hidden rounded-[1.85rem] text-shell-foreground sm:rounded-[2.15rem]">
+          <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10">
+            <header className="mb-7 sm:mb-8">
+              <div className="glass-chip mb-3 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium text-brand">
+                <Sparkles className="h-3.5 w-3.5" />
+                YouTube Community Intelligence
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <div className="font-medium">Analysis failed</div>
-                  <p className="mt-0.5 text-sm text-muted-foreground">{error}</p>
+                  <h1 className="text-3xl font-semibold tracking-tight text-[#10182b] sm:text-[2.45rem]">
+                    Community AI
+                  </h1>
+                  <p className="mt-1.5 max-w-xl text-sm text-muted-foreground sm:text-[15px]">
+                    Analyze comments, surface themes, and export producer-ready reports.
+                  </p>
+                </div>
+                {phase === "done" && (
+                  <Button variant="outline" size="sm" onClick={resetToIdle}>
+                    New analysis
+                  </Button>
+                )}
+              </div>
+            </header>
+
+            <Card>
+              <CardContent className="p-4 sm:p-5">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    analyze(url);
+                  }}
+                  className="flex flex-col gap-3 sm:flex-row"
+                >
+                  <Input
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="Paste a YouTube video or channel URL…"
+                    className="h-12 flex-1 text-[15px]"
+                    disabled={phase === "running"}
+                    autoFocus
+                  />
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="h-12 shrink-0"
+                    disabled={phase === "running" || !url.trim()}
+                  >
+                    {phase === "running" ? "Analyzing…" : "Analyze Community"}
+                    {phase !== "running" && <ArrowRight className="h-4 w-4" />}
+                  </Button>
+                </form>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Try:</span>
+                  {EXAMPLES.map((ex) => (
+                    <button
+                      key={ex}
+                      onClick={() => {
+                        setUrl(ex);
+                        analyze(ex);
+                      }}
+                      disabled={phase === "running"}
+                      className="glass-chip rounded-full px-3 py-1 text-xs font-medium text-[#2a3550] transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+                    >
+                      {ex.replace("https://www.youtube.com/", "")}
+                    </button>
+                  ))}
                 </div>
               </CardContent>
             </Card>
-          </div>
-        )}
 
-        {phase !== "done" && phase !== "running" && (
-          <RunHistory runs={runs} onSelect={loadRun} loadingId={loadingRunId} />
-        )}
+            <div className="mt-6 space-y-6">
+              {phase === "running" && <ProgressPanel phase={progress} />}
 
-        {phase === "done" && result && (
-          <>
-            <div className="flex items-center justify-between">
-              <Badge variant="success" className="gap-1">
-                Analysis complete
-              </Badge>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setPhase("idle");
-                  setResult(null);
-                  setUrl("");
-                }}
-              >
-                New analysis
-              </Button>
+              {phase === "error" && error && (
+                <Card className="border-destructive/30">
+                  <CardContent className="flex items-start gap-3 p-5">
+                    <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+                    <div>
+                      <div className="font-medium">Analysis failed</div>
+                      <p className="mt-0.5 text-sm text-muted-foreground">{error}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {phase === "done" && result && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="brand" className="gap-1">
+                      Analysis complete
+                    </Badge>
+                  </div>
+                  <ReportView
+                    video={result.video}
+                    report={result.report}
+                    comments={result.comments}
+                    persisted={result.persisted}
+                    selectionNote={result.selectionNote}
+                  />
+                </>
+              )}
+
+              {(phase !== "running") && (
+                <div id="run-history">
+                  <RunHistory runs={runs} onSelect={loadRun} loadingId={loadingRunId} />
+                </div>
+              )}
             </div>
-            <ReportView
-              video={result.video}
-              report={result.report}
-              comments={result.comments}
-              persisted={result.persisted}
-              selectionNote={result.selectionNote}
-            />
-            <RunHistory runs={runs} onSelect={loadRun} loadingId={loadingRunId} />
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );

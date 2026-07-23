@@ -7,7 +7,7 @@ import { CornerDownRight, ThumbsUp } from "lucide-react";
 
 export function EvidenceComment({ comment }: { comment: StoredComment }) {
   return (
-    <li className="rounded-md border border-border bg-muted/40 px-3 py-2">
+    <li className="glass-chip rounded-xl px-3 py-2">
       <div className="mb-1 flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-1.5 text-[13px] font-medium">
           {comment.isReply && (

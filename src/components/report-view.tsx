@@ -112,7 +112,7 @@ export function ReportView({
         <Card className="lg:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-[15px]">
-              <Sparkles className="h-4 w-4 text-muted-foreground" />
+              <Sparkles className="h-4 w-4 text-brand" />
               Executive Summary
             </CardTitle>
           </CardHeader>
@@ -125,7 +125,7 @@ export function ReportView({
                   <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     <Award className="h-3.5 w-3.5" /> Top Comment
                   </div>
-                  <blockquote className="rounded-lg border border-border bg-muted/40 p-3 text-sm">
+                  <blockquote className="glass-chip rounded-2xl p-3.5 text-sm">
                     “{report.topComment.text}”
                     <footer className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                       <span className="font-medium text-foreground/80">
@@ -257,7 +257,7 @@ function FutureEpisodesCard({ report }: { report: FullReport }) {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-[15px]">
-          <Sparkles className="h-4 w-4 text-muted-foreground" />
+          <Sparkles className="h-4 w-4 text-brand" />
           Most Requested Future Episodes
         </CardTitle>
       </CardHeader>
@@ -280,7 +280,7 @@ function FutureEpisodesCard({ report }: { report: FullReport }) {
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-secondary">
                       <div
-                        className="h-full rounded-full bg-primary"
+                        className="h-full rounded-full bg-brand"
                         style={{ width: `${(e.mentionCount / max) * 100}%` }}
                       />
                     </div>
@@ -327,7 +327,7 @@ function ModerationCard({ report }: { report: FullReport }) {
     <Card className="flex h-full flex-col">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-[15px]">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <span className="btn-glass flex h-8 w-8 items-center justify-center rounded-[0.9rem] text-brand">
             <Shield className="h-4 w-4" />
           </span>
           Moderation Issues
@@ -376,7 +376,7 @@ function ActionItemsCard({ report }: { report: FullReport }) {
           <ol className="space-y-2">
             {report.actionItems.map((a, i) => (
               <li key={i} className="flex gap-3 text-sm">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-brand-foreground">
                   {i + 1}
                 </span>
                 <span className="leading-relaxed">{a}</span>

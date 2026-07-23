@@ -21,7 +21,7 @@ export function RunHistory({
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-[15px]">
-          <History className="h-4 w-4 text-muted-foreground" />
+          <History className="h-4 w-4 text-brand" />
           Recent Analyses
         </CardTitle>
       </CardHeader>
@@ -32,14 +32,14 @@ export function RunHistory({
               key={r.id}
               onClick={() => onSelect(r.id)}
               disabled={loadingId === r.id}
-              className="flex items-center gap-3 rounded-lg border border-border p-2.5 text-left transition-colors hover:bg-accent disabled:opacity-60"
+              className="glass-chip flex items-center gap-3 rounded-2xl p-2.5 text-left transition-transform hover:-translate-y-0.5 disabled:opacity-60"
             >
               {r.thumbnail && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={r.thumbnail}
                   alt=""
-                  className="h-10 w-16 shrink-0 rounded object-cover"
+                  className="h-10 w-16 shrink-0 rounded-xl object-cover"
                 />
               )}
               <div className="min-w-0 flex-1">
