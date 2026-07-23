@@ -8,6 +8,6 @@ export async function GET() {
     hasOpenAI: features.hasOpenAI,
     hasYouTube: features.hasYouTube,
     hasSupabase: features.hasSupabase,
-    model: process.env.OPENAI_MODEL ?? "gpt-5",
+    model: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
   });
 }

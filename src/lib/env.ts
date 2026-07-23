@@ -23,7 +23,8 @@ export const env = {
     return required("OPENAI_API_KEY");
   },
   get openaiModel() {
-    return optional("OPENAI_MODEL") ?? "gpt-5";
+    // Fast default — gpt-5 is often too slow for multi-batch serverless runs.
+    return optional("OPENAI_MODEL") ?? "gpt-4o-mini";
   },
   get youtubeApiKey() {
     return required("YOUTUBE_API_KEY");

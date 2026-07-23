@@ -83,6 +83,9 @@ export async function analyzeBatch(
   video: VideoMeta,
 ): Promise<BatchAnalysis> {
   const oai = getClient();
+  // Prefer a fast model when OPENAI_MODEL is unset; gpt-5 can be too slow for
+  // multi-batch serverless runs and causes stream timeouts.
+  const model = env.openaiModel;
   const input = `You are an expert YouTube community manager analyzing viewer comments for a video.
 
 VIDEO
@@ -104,7 +107,7 @@ ${renderComments(batch)}`;
   return withRetry(
     async () => {
       const response = await oai.responses.parse({
-        model: env.openaiModel,
+        model,
         input,
         text: { format: zodTextFormat(BatchAnalysisSchema, "batch_analysis") },
       });

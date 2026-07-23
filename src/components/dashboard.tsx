@@ -120,10 +120,14 @@ export function Dashboard() {
         // Accumulate video/comments so the "done" event isn't required to carry it.
         let liveVideo: VideoMeta | null = null;
         let finished = false;
+        let lastStage = "starting";
 
         const handle = (event: ProgressEvent) => {
           switch (event.type) {
             case "status":
+              if (event.message !== "Still analyzing…") {
+                lastStage = event.message;
+              }
               setProgress((p) => ({ ...p, status: event.message }));
               break;
             case "video":
@@ -142,6 +146,7 @@ export function Dashboard() {
               }));
               break;
             case "batch":
+              lastStage = `batch ${event.index}/${event.total}`;
               setProgress((p) => ({
                 ...p,
                 status: event.message,
@@ -149,6 +154,7 @@ export function Dashboard() {
               }));
               break;
             case "merge":
+              lastStage = "merge";
               setProgress((p) => ({ ...p, status: event.message, merging: true }));
               break;
             case "done":
@@ -197,7 +203,11 @@ export function Dashboard() {
         }
 
         if (!finished) {
-          setError("The analysis stream ended unexpectedly.");
+          setError(
+            lastStage.startsWith("batch") || lastStage === "merge"
+              ? `The server closed the connection during ${lastStage}. This usually means the host timed out mid-analysis — try again, or use a video with fewer comments.`
+              : "The analysis stream ended unexpectedly. Try again in a moment.",
+          );
           setPhase("error");
         }
       } catch (err) {

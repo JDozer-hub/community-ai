@@ -68,7 +68,7 @@ export async function persistAnalysis(args: {
     const { error: repErr } = await supabase.from("ai_reports").insert({
       run_id: runId,
       video_id: video.videoId,
-      model: process.env.OPENAI_MODEL ?? "gpt-5",
+      model: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
       confidence: report.confidence,
       report,
     });

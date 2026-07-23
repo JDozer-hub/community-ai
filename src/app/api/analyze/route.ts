@@ -30,16 +30,39 @@ export async function POST(req: NextRequest) {
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
+      let closed = false;
       const send = (event: ProgressEvent) => {
-        controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
+        } catch {
+          closed = true;
+        }
+      };
+
+      // Keep the HTTP stream alive while OpenAI batches run (proxies often
+      // drop silent connections after ~15–30s).
+      const heartbeat = setInterval(() => {
+        send({ type: "status", message: "Still analyzing…" });
+      }, 8000);
+
+      const close = () => {
+        if (closed) return;
+        closed = true;
+        clearInterval(heartbeat);
+        try {
+          controller.close();
+        } catch {
+          /* already closed */
+        }
       };
 
       if (missing.length) {
         send({
           type: "error",
-          message: `Missing ${missing.join(" and ")} in .env.local. Add your API key(s) and restart the dev server.`,
+          message: `Missing ${missing.join(" and ")}. Add your API key(s) in the environment and redeploy / restart.`,
         });
-        controller.close();
+        close();
         return;
       }
 
@@ -51,7 +74,7 @@ export async function POST(req: NextRequest) {
           message: err instanceof Error ? err.message : "Analysis failed unexpectedly.",
         });
       } finally {
-        controller.close();
+        close();
       }
     },
   });

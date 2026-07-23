@@ -167,34 +167,44 @@ export async function runAnalysis(url: string, emit: Emit): Promise<void> {
     const batchResults: BatchAnalysis[] = [];
     let refCounter = 0;
 
-    for (let b = 0; b < batchesInput.length; b++) {
+    // Run a couple of batches in parallel to finish within host time limits,
+    // while still emitting ordered progress for the UI.
+    const CONCURRENCY = 2;
+    for (let start = 0; start < batchesInput.length; start += CONCURRENCY) {
+      const slice = batchesInput.slice(start, start + CONCURRENCY);
       emit({
         type: "batch",
-        index: b + 1,
+        index: Math.min(start + slice.length, total),
         total,
-        message: `Analyzing batch ${b + 1} / ${total} (${batchesInput[b].length} comments)…`,
+        message:
+          slice.length === 1
+            ? `Analyzing batch ${start + 1} / ${total} (${slice[0].length} comments)…`
+            : `Analyzing batches ${start + 1}–${start + slice.length} / ${total}…`,
       });
-      const result = await analyzeBatch(batchesInput[b], video);
-      batchResults.push(result);
 
-      for (const theme of result.themes) {
-        const indices = theme.commentIndices.filter(
-          (i) => Number.isInteger(i) && i >= 0 && i < comments.length,
-        );
-        if (indices.length === 0) continue;
-        collectedThemes.push({
-          ref: `t${refCounter++}`,
-          category: theme.category,
-          label: theme.label.trim() || "Untitled theme",
-          indices,
-        });
-      }
-      for (const mod of result.moderation) {
-        const indices = mod.commentIndices.filter(
-          (i) => Number.isInteger(i) && i >= 0 && i < comments.length,
-        );
-        if (indices.length === 0) continue;
-        collectedMods.push({ type: mod.type, indices });
+      const results = await Promise.all(slice.map((batch) => analyzeBatch(batch, video)));
+
+      for (const result of results) {
+        batchResults.push(result);
+        for (const theme of result.themes) {
+          const indices = theme.commentIndices.filter(
+            (i) => Number.isInteger(i) && i >= 0 && i < comments.length,
+          );
+          if (indices.length === 0) continue;
+          collectedThemes.push({
+            ref: `t${refCounter++}`,
+            category: theme.category,
+            label: theme.label.trim() || "Untitled theme",
+            indices,
+          });
+        }
+        for (const mod of result.moderation) {
+          const indices = mod.commentIndices.filter(
+            (i) => Number.isInteger(i) && i >= 0 && i < comments.length,
+          );
+          if (indices.length === 0) continue;
+          collectedMods.push({ type: mod.type, indices });
+        }
       }
     }
 
